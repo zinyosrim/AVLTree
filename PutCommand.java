@@ -9,10 +9,11 @@ public class PutCommand implements Command {
     private final int CYLINDER_NUMBER_OF_PARAMS = 8;
     private final int PYRAMID_NUMBER_OF_PARAMS = 9;
     private final int SPHERE_NUMBER_OF_PARAMS = 7;
+    private final int POSITION_OF_X = 3;
 
     private ArrayList<String> commandTokens= new ArrayList<String>();
     private AVLTree myAVLTree;
-    private Body body;
+    //private Body body;
     // private Double x, y, z, l, w, h, r;
 
     public PutCommand(AVLTree myAVLTree, ArrayList<String> commandTokens){
@@ -48,15 +49,23 @@ public class PutCommand implements Command {
         }
     }
 
+    /**
+     * Check if object coordinates and attributes are all double
+     * @return true if so.
+     */
     private boolean paramsAreAllDouble(){
 
+        // RegEx pattern
         String pattern = "(\\d+\\.?\\d*)";
         Pattern r = Pattern.compile(pattern);
-        for (int i = 3; i< commandTokens.size()-1; i++) {
-            // Now create matcher object.
+
+        // iterate through all params and check if they're all of type double
+        for (int i = POSITION_OF_X; i< commandTokens.size()-1; i++) {
             Matcher m = r.matcher(commandTokens.get(i));
+            // there is at least one param which is not double
             if (!m.find()) return false;
         }
+        // all are double
         return true;
     }
 }

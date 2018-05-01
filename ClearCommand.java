@@ -11,6 +11,6 @@ public class ClearCommand {
 
     public void execute(){
         // avltree.put
-        System.out.println("Execute clear " );
+        System.out.println("ClearCommand.execute() not yet implemented" );
     }
 }

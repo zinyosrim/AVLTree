@@ -3,39 +3,22 @@
  * a AVL Tree data structure
  */
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public final class TestList {
 
-    private TestList() {
-    }
+    public static void main( String args[] ) {
+        System.out.println("lorem  ipsum   dolor \n sit.".replaceAll("\\s+", " "));
+        String input = "  lorem  ipsum   dolor \n sit.";
+        input.trim();
+        ArrayList<String> commandTokens =
+                //new ArrayList<String>(Arrays.asList(input.split(" ")));
+                new ArrayList<String>(Arrays.asList(input.replaceAll("\\s+", " ").split(" ")));
 
-    /**
-     * Provide a command shell to execute operations an a trie
-     *
-     * @param args
-     * @throws IOException
-     */
-    public static void main(String[] args) throws IOException {
-        ArrayList<String> l = new ArrayList<>();
-        l.add("22");
-        l.add("33");
-        l.add("44");
-
-        for (String token : l) {
+        for (String token: commandTokens){
             System.out.println(token);
         }
-
-        l.remove(0);
-        l.remove(0);
-        for (String token : l) {
-            System.out.println(token);
-        }
-
-
     }
 }

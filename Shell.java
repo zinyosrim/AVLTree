@@ -1,6 +1,6 @@
 /**
  * Launches a simple shell to create, modify and output
- * a AVL Tree data structure
+ * an AVL Tree data structure
  */
 
 import java.io.BufferedReader;
@@ -21,6 +21,7 @@ public final class Shell {
         AVLTree myAVLTree = new AVLTree<String, Body>();
         BufferedReader stdin =
                 new BufferedReader(new InputStreamReader(System.in));
+        ArrayList<String> commandTokens;
 
         boolean quit = false;
         while (!quit) {
@@ -30,16 +31,18 @@ public final class Shell {
             String input = stdin.readLine();
             if (input == null) { break; }
 
-            // strip obsolete spaces and fill ArrayList wit command and params
-            input.trim().replaceAll(" +", " ");
-            ArrayList<String> commandTokens =
-                    new ArrayList<String>(Arrays.asList(input.split(" ")));
+            // strip obsolete spaces and fill ArrayList with command and params
+            input.replaceAll("\\s+?"," ");
+            input.trim();
+            commandTokens = new ArrayList<String>(Arrays.asList
+                                (input.replaceAll("\\s+", " ").split(" ")));
 
             // create command instances
             ClearCommand clearCommand = new ClearCommand(myAVLTree);
             PutCommand putCommand = new PutCommand (myAVLTree, commandTokens );
             HelpCommand helpCommand = new HelpCommand();
             QuitCommand quitCommand = new QuitCommand();
+            InvalidCommand invalidCommand = new InvalidCommand();
 
             // command execution
             switch (commandTokens.get(0).toLowerCase()){
@@ -55,6 +58,7 @@ public final class Shell {
                 case "quit":
                     quitCommand.execute(); break;
                 default:
+                    invalidCommand.execute();
             }
         }
     }
