@@ -11,10 +11,8 @@ import java.util.Arrays;
 
 public final class Shell {
 
-    private Shell(){}
-
     /**
-     * Provide a command shell to execute operations an a trie
+     * Provide a command shell to execute operations an a AVLTree
      * @param args
      * @throws IOException
      */
@@ -26,46 +24,38 @@ public final class Shell {
 
         boolean quit = false;
         while (!quit) {
+
+            // read command from shell
             System.out.print("avltree> ");
             String input = stdin.readLine();
-            if (input == null) {
-                break;
-            }
+            if (input == null) { break; }
 
+            // strip obsolete spaces and fill ArrayList wit command and params
             input.trim().replaceAll(" +", " ");
-
             ArrayList<String> commandTokens =
                     new ArrayList<String>(Arrays.asList(input.split(" ")));
 
-            /*for (String token : commandTokens){
-                System.out.println(token);
-            }*/
+            // create command instances
+            ClearCommand clearCommand = new ClearCommand(myAVLTree);
+            PutCommand putCommand = new PutCommand (myAVLTree, commandTokens );
+            HelpCommand helpCommand = new HelpCommand();
+            QuitCommand quitCommand = new QuitCommand();
 
+            // command execution
             switch (commandTokens.get(0).toLowerCase()){
                 case "clear":
-                    ClearCommand clearCommand =
-                            new ClearCommand(myAVLTree);
-                    clearCommand.execute();
-                    break;
+                    clearCommand.execute(); break;
                 case "put":
-                    PutCommand putCommand =
-                            new PutCommand (myAVLTree, commandTokens ) ;
-                    putCommand.execute();
-                    break;
+                    putCommand.execute(); break;
                 case "remove": break;
                 case "objects": break;
                 case "debug": break;
-                case "help": break;
-                case "quit": break;
+                case "help":
+                    helpCommand.execute(); break;
+                case "quit":
+                    quitCommand.execute(); break;
                 default:
-
             }
-
-
-
-
-            //avlCommand command = new Command(input, avltree);
-            //command.execute();
         }
     }
 }
