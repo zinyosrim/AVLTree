@@ -1,4 +1,6 @@
 /** The Command interface */
 public interface Command {
-    void execute();
+    String execute();
+
+    boolean matches(String cmd);
 }

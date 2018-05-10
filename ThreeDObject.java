@@ -1,12 +1,15 @@
 /**
  * Abstract class for 3D objects. Use to create geometric 3d objects
  */
-public abstract class Body {
+public abstract class ThreeDObject {
+
     final double x;
+
     final double y;
+
     final double z;
 
-    Body(double x, double y, double z){
+    ThreeDObject(double x, double y, double z){
         this.x = x;
         this.y = y;
         this.z = z;

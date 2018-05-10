@@ -1,65 +1,80 @@
-/**
- * Launches a simple shell to create, modify and output
- * an AVL Tree data structure
- */
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
+/**
+ * Launch a simple shell to create, modify and output
+ * an AVL Tree data structure
+ */
 public final class Shell {
 
     /**
-     * Provide a command shell to execute operations an a AVLTree
-     * @param args
-     * @throws IOException
+     * Provide a command shell to execute operations an a AvlTreeMap
+     * @param args main parameters
+     * @throws IOException for handling input
      */
     public static void main ( String [] args) throws IOException {
 
-        AVLTree myAVLTree = new AVLTree<String, Body>();
-        BufferedReader stdin =
-                new BufferedReader(new InputStreamReader(System.in));
+        // AvlTreeMap initialization
+        Comparator<String> myComparator = String::compareTo;
+        AvlTreeMap<String, ThreeDObject> avlTreeMap = new AvlTreeMap<>(myComparator);
+
+        // Command shell initialization
+        BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
         ArrayList<String> commandTokens;
 
-        boolean quit = false;
-        while (!quit) {
+        // Command shell operations
+        boolean userCommandIsNotQuit = true;
 
-            // read command from shell
-            System.out.print("avltree> ");
+        while (userCommandIsNotQuit) {
+
+            // Read command from shell
+            System.out.print("PROMPT> ");
             String input = stdin.readLine();
-            if (input == null) { break; }
 
-            // strip obsolete spaces and fill ArrayList with command and params
-            input.replaceAll("\\s+?"," ");
+            // Remove obsolete spaces and fill ArrayList with command and params
+            //input.replaceAll("\\s+?"," ");
             input.trim();
             commandTokens = new ArrayList<String>(Arrays.asList
                                 (input.replaceAll("\\s+", " ").split(" ")));
 
             // create command instances
-            ClearCommand clearCommand = new ClearCommand(myAVLTree);
-            PutCommand putCommand = new PutCommand (myAVLTree, commandTokens );
-            HelpCommand helpCommand = new HelpCommand();
-            QuitCommand quitCommand = new QuitCommand();
-            InvalidCommand invalidCommand = new InvalidCommand();
+            CmdClear cmdClear       = new CmdClear(avlTreeMap);
+            CmdFind cmdFind         = new CmdFind(avlTreeMap, commandTokens);
+            CmdPut cmdPut           = new CmdPut(avlTreeMap, commandTokens);
+            CmdRemove cmdRemove     = new CmdRemove(avlTreeMap, commandTokens);
+            CmdObjects cmdObjects   = new CmdObjects(avlTreeMap);
+            CmdDebug cmdDebug       = new CmdDebug(avlTreeMap);
+            CmdHelp cmdHelp         = new CmdHelp();
+            CmdVolume cmdVolume     = new CmdVolume(avlTreeMap, commandTokens);
+            CmdSurface cmdSurface   = new CmdSurface(avlTreeMap, commandTokens);
+            CmdQuit cmdQuit         = new CmdQuit();
 
-            // command execution
-            switch (commandTokens.get(0).toLowerCase()){
-                case "clear":
-                    clearCommand.execute(); break;
-                case "put":
-                    putCommand.execute(); break;
-                case "remove": break;
-                case "objects": break;
-                case "debug": break;
-                case "help":
-                    helpCommand.execute(); break;
-                case "quit":
-                    quitCommand.execute(); break;
-                default:
-                    invalidCommand.execute();
+            List<Command> allowedCommands  = Arrays.asList(
+                                                cmdClear, cmdFind, cmdPut,cmdRemove,cmdObjects,
+                                                cmdDebug, cmdHelp, cmdVolume, cmdSurface, cmdQuit);
+            boolean commandMatched = false;
+
+            for (Command cmd : allowedCommands) {
+
+                if (cmd.matches(commandTokens.get(0))) {
+                    System.out.print(cmd.execute());
+                    commandMatched = true;
+                }
+            }
+
+            if (!commandMatched) {
+                    System.out.print("Error! Invalid command. Enter HELP for valid commands.\n");
+            }
+
+            if (cmdQuit.matches(commandTokens.get(0))) {
+                        userCommandIsNotQuit = false;
             }
         }
     }
 }
+
