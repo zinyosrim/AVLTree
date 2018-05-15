@@ -12,7 +12,7 @@ import java.util.NoSuchElementException;
  */
 public class AvlTreeMap<K, V> implements SortedMap<K, V> {
     private Comparator<K> comparator;
-    private AvlNode<K,V> root;
+    public AvlNode<K,V> root;
 
     public AvlTreeMap(Comparator<K> comparator){
         this.root = new AvlNode<>(null, null);
@@ -62,7 +62,7 @@ public class AvlTreeMap<K, V> implements SortedMap<K, V> {
      */
     @Override
     public boolean containsKey(K key) {
-        if ((this.find(key, this.root) == null)) {
+        if ((this.findNode(key, this.root) == null)) {
             return false;
         } else return true;
     }
@@ -77,61 +77,156 @@ public class AvlTreeMap<K, V> implements SortedMap<K, V> {
      */
     @Override
     public V get(K key) {
-        AvlNode<K,V> nodeToFind = find(key, this.root);
+        AvlNode<K,V> nodeToFind = findNode(key, this.root);
 
-        if (nodeToFind == null) {
+        if (nodeToFind == null || this.isEmpty()) {
             return null;
 
         } else return nodeToFind.getValue();
     }
 
+    /**
+     * Insert a map into the AVL tree
+     * @param key
+     *            the key.
+     * @param value
+     *            the value.
+     * @return
+     */
     @Override
     public V put(K key, V value) {
+        AvlNode<K, V> newNode = new AvlNode<>(key, value);
+        AvlNode<K, V> resultNode;
 
-        AvlNode<K, V> newNode = new AvlNode<>(key, value) ;
+        if (root.getKey() == null) {
+            root = newNode;
 
-        // Tree is empty -> Set new node as root
-        if ( this.isEmpty() ){
-            this.root = newNode;
-            return null;
-        }
-
-        // Tree is not empty
-        AvlNode<K, V> currentNode = this.root;
-        boolean notYetInsertedIntoTree = true;
-        while (notYetInsertedIntoTree){
-
-            // New node goes into the right branch
-            if ( comparator.compare(newNode.getKey(), currentNode.getKey()) < 0) {
-
-                if ( currentNode.getLeft() == null ){
-                    currentNode.setLeft(newNode);
-                    newNode.setParent(currentNode);
-
-                } else currentNode = currentNode.getLeft();
-
-            // New node goes into the right branch
-            } else if ( comparator.compare(newNode.getKey(), currentNode.getKey() ) > 0){
-
-                if ( currentNode.getRight() == null ) {
-                    currentNode.setRight(newNode);
-                    newNode.setParent(currentNode);
-                } currentNode = currentNode.getRight();
-
-            // Key exists in the tree. Set the new value
-            } else {
-                V oldValue = currentNode.getValue();
-                currentNode.setValue(value);
-                return oldValue;
-            }
-        }
-        return null;
+        } else
+            root = insert(root, newNode);
+        return newNode.getValue();
     }
-
 
     @Override
     public V remove(K key) {
         return null;
+    }
+
+    /**
+     * Insert an AVL Node into the subtree giveb as first parameter
+     * @param treeNode root node of a subtree
+     * @param newNode node to be inserted
+     * @return the inserted node
+     */
+    private AvlNode<K,V> insert (AvlNode<K, V> treeNode, AvlNode<K, V> newNode) {
+
+        // empty tree, the new node becomes the root
+        if (treeNode == null)
+            return newNode;
+
+        // new node has a smaller key, so it goes into the left branch
+        if (comparator.compare(newNode.getKey(), treeNode.getKey()) < 0) {
+            treeNode.setLeft(insert(treeNode.getLeft(), newNode));
+        }
+
+        // bigger key -> right branch
+        else {
+            treeNode.setRight(insert(treeNode.getRight(), newNode));
+        }
+
+        // recalculate height of the root of the subtree
+        treeNode.setHeight(Math.max(height(treeNode.getLeft()), height(treeNode.getRight())) + 1);
+        int balance = balance(treeNode);
+
+        // Check if subtree root became unbalanced. There are 4 scenarios
+
+        // 1. LeftLeft
+        if (balance > 1 &&
+                comparator.compare(newNode.getKey(), treeNode.getLeft().getKey()) < 0) {
+            return rightRotate(treeNode);
+        }
+
+        // 2. RightRight
+        if (balance < -1 &&
+                comparator.compare(newNode.getKey(), treeNode.getRight().getKey()) > 0) {
+            return leftRotate(treeNode);
+        }
+
+        // 3. LeftRight
+        if (balance > 1 &&
+                comparator.compare(newNode.getKey(), treeNode.getLeft().getKey()) > 0) {
+            treeNode.setLeft(leftRotate(treeNode.getLeft()));
+            return rightRotate(treeNode);
+        }
+
+        // 4. RightLeft
+        if (balance < -1 &&
+                comparator.compare(newNode.getKey(), treeNode.getRight().getKey()) <0) {
+            treeNode.setRight(rightRotate(treeNode.getRight()));
+            return leftRotate(treeNode);
+        }
+        return treeNode;
+    }
+
+    /**
+     * Right rotate an AVL tree over a given node
+     */
+    private AvlNode<K,V> rightRotate(AvlNode<K,V>  nodeUsedForRotation) {
+        AvlNode<K,V>  leftChild = nodeUsedForRotation.getLeft();
+        AvlNode<K,V>  rightSubTree = leftChild.getRight();
+
+        // rotate
+        AvlNode<K,V> tempParent = nodeUsedForRotation.getParent();
+        leftChild.setRight(nodeUsedForRotation);
+        leftChild.setParent(tempParent);
+        nodeUsedForRotation.setLeft(rightSubTree);
+
+        // update heights
+        leftChild.setHeight(Math.max(
+                height(nodeUsedForRotation.getLeft()),
+                height(nodeUsedForRotation.getRight()))+1);
+        leftChild.setHeight(Math.max(
+                height(leftChild.getLeft()),
+                height(leftChild.getRight()))+1);
+
+        // return new root
+        return leftChild;
+    }
+
+    /**
+     * left rotate an AVL tree over a given node
+     */
+    private AvlNode<K,V> leftRotate(AvlNode<K,V> nodeUsedForRotation) {
+        AvlNode<K,V> rightChild = nodeUsedForRotation.getRight();
+        AvlNode<K,V> leftSubTree = rightChild.getLeft();
+
+        // rotate
+        AvlNode<K,V> tempParent = nodeUsedForRotation.getParent();
+        rightChild.setLeft(nodeUsedForRotation);
+        rightChild.setParent(tempParent);
+        nodeUsedForRotation.setRight(leftSubTree);
+
+        // update heights
+        nodeUsedForRotation.setHeight(
+                Math.max(
+                        height(nodeUsedForRotation.getLeft()),
+                        height(nodeUsedForRotation.getRight()))+1);
+        rightChild.setHeight(
+                Math.max(
+                        height(rightChild.getLeft()),
+                        height(rightChild.getRight()))+1);
+
+        // return new root
+        return rightChild;
+    }
+
+    /**
+     * Return the balance of a given node as the difference between it's
+     * left subtree height and right subtree height
+     */
+    private int balance(AvlNode<K,V> node) {
+        if (node == null)
+            return 0;
+        return height(node.getLeft()) - height(node.getRight());
     }
 
     /**
@@ -190,12 +285,12 @@ public class AvlTreeMap<K, V> implements SortedMap<K, V> {
     /**
      * Find a node with a specific key in the tree
      *
-     * @param key of node to find
+     * @param key of node to findNode
      * @param node value of node
      * @return node if a node with the given key is found, otherwise null
      *
      */
-    public AvlNode<K,V> find(K key, AvlNode<K, V> node) {
+    public AvlNode<K,V> findNode(K key, AvlNode<K, V> node) {
         if (this.isEmpty()) return null;
 
         AvlNode<K, V> currentNode = node;
@@ -208,11 +303,11 @@ public class AvlTreeMap<K, V> implements SortedMap<K, V> {
 
         else if ( myComparator < 0 &&
                   (currentNode.getLeft() != null) )
-            return this.find(key, currentNode.getLeft());
+            return this.findNode(key, currentNode.getLeft());
 
         else if ( myComparator > 0  &&
                   (currentNode.getRight() != null) )
-            return this.find(key, currentNode.getRight());
+            return this.findNode(key, currentNode.getRight());
 
         else return null;
     }
@@ -225,7 +320,6 @@ public class AvlTreeMap<K, V> implements SortedMap<K, V> {
      *         e.g. ([1] b=1 () ([0] c=5 () ()))
      */
     private String preOrder( AvlNode<K, V> node ) {
-
         StringBuilder preOrderString = new StringBuilder();
         preOrderString.append("(");
         if (!this.isEmpty()) {
@@ -238,7 +332,6 @@ public class AvlTreeMap<K, V> implements SortedMap<K, V> {
                 preOrderString.append("] ");
                 preOrderString.append(currentNode.getKey().toString());
                 preOrderString.append("=");
-                //preOrderString.append(currentNode.getKey().toString());
                 preOrderString.append(currentNode.getValue().toString());
                 preOrderString.append(" ");
             }
@@ -246,26 +339,17 @@ public class AvlTreeMap<K, V> implements SortedMap<K, V> {
             // build left child part
             if ( currentNode.getLeft() != null )
                 preOrderString.append(preOrder(currentNode.getLeft()));
-            else preOrderString.append("() ");
 
+            else preOrderString.append("()");
+            preOrderString.append(" ");
             // build right child part
             if ( currentNode.getRight() != null )
                 preOrderString.append(preOrder(currentNode.getRight()));
-            else preOrderString.append("()");
 
+            else preOrderString.append("()");
         }
         preOrderString.append(")");
         return preOrderString.toString();
-    }
-
-    /**
-     * Return the balance of a given node as the difference between it's
-     * left subtree height and right subtree height
-     * @param node
-     * @return int
-     */
-    public int balance(AvlNode<K,V> node ) {
-        return this.height(node.getLeft()) - this.height(node.getRight());
     }
 
     /**
@@ -273,8 +357,7 @@ public class AvlTreeMap<K, V> implements SortedMap<K, V> {
      * @param node
      * @return int max number of edges between root and leaves
      */
-    public int height(AvlNode<K,V> node ) {
-
+    private int height(AvlNode<K,V> node ) {
         // Empty tree case
         if (node == null) {
             return 0;
