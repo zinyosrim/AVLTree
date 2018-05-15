@@ -32,7 +32,9 @@ public class ThreeDCylinder extends ThreeDObject {
      */
     @Override
     double area() {
-        return 2*Math.PI*r*h;
+        double p = Math.PI*r*r;
+        double q = 2*Math.PI*r*h;
+        return 2*p + q;
     }
 
     @Override

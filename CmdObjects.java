@@ -5,10 +5,10 @@ import java.util.Iterator;
  */
 public class CmdObjects implements Command {
 
-    private AvlTreeMap myAvlTreeMap;
+    private AvlTreeMap avlTreeMap;
 
-    public CmdObjects(AvlTreeMap myAvlTreeMap){
-        this.myAvlTreeMap = myAvlTreeMap;
+    public CmdObjects(AvlTreeMap avlTreeMap){
+        this.avlTreeMap = avlTreeMap;
     }
 
     /**
@@ -18,10 +18,10 @@ public class CmdObjects implements Command {
     @Override
     public String execute() {
         StringBuilder objectsString = new StringBuilder();
-        Iterator iterator = myAvlTreeMap.iterator();
+        Iterator iterator = avlTreeMap.iterator();
         objectsString.append("[");
 
-        if (!myAvlTreeMap.isEmpty()) {
+        if (!avlTreeMap.isEmpty()) {
 
             while (iterator.hasNext()) {
                 objectsString.append(iterator.next());

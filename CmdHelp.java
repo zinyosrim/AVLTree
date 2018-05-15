@@ -24,7 +24,7 @@ public class CmdHelp implements Command{
                 "OBJECTS   : Output the nodes of the tree in in-order\n" +
                 "DEBUG     : Output the keys, nodes and structure of the tree in pre-order\n" +
                 "QUIT      : Quit the AvlTreeMap shell\n" +
-                "HELP      : Display this message\n";
+                "HELP      : Display this message\n\n";
     }
 
     /**

@@ -8,8 +8,11 @@
 public class AvlNode<K, V>  {
 
     private AvlNode<K, V> left, right, parent;
+
     private int height = 1;
+
     private K key;
+
     private V value;
 
     public AvlNode(K key, V value) {
@@ -17,36 +20,54 @@ public class AvlNode<K, V>  {
         this.value = value;
     }
 
-    public V getValue() { return value; }
-
     public K getKey() {
         return key;
     }
 
-    public int getHeight() { return height; }
-
-    public AvlNode<K, V> getLeft() { return left; }
-
-    public AvlNode<K, V> getRight() { return right; }
-
-    public AvlNode<K, V> getParent() {
-        return parent;
+    public void setHeight(int height) {
+        this.height = height;
     }
 
-    public void setLeft(AvlNode<K, V> left) {
-        this.left = left;
-    }
-
-    public void setRight(AvlNode<K, V> right) {
-        this.right = right;
-    }
-
-    public void setParent(AvlNode<K, V> parent) {
-        this.parent = parent;
-    }
+    public V getValue() {
+        return value; }
 
     public void setValue(V value) {
         this.value = value;
     }
 
+    public AvlNode<K, V> getRight() {
+        if (this != null) {
+            return right;
+
+        } else {
+            return null;
+        }
+    }
+
+    public void setRight(AvlNode<K, V> node) {
+        this.right = node;
+        if (this != null && node != null) node.parent = this;
+    }
+
+    public AvlNode<K, V> getLeft() {
+        if (this != null) {
+            return left;
+
+        } else {
+            return null;
+        }
+    }
+
+    public void setLeft(AvlNode<K, V> node) {
+        this.left = node;
+        if (this != null && node != null) node.parent = this;
+    }
+
+    public AvlNode<K, V> getParent() {
+        return parent;
+    }
+
+    public void setParent(AvlNode<K, V> parent) {
+        this.parent = parent;
+    }
 }

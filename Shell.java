@@ -37,7 +37,7 @@ public final class Shell {
             String input = stdin.readLine();
 
             // Remove obsolete spaces and fill ArrayList with command and params
-            //input.replaceAll("\\s+?"," ");
+            input.replaceAll("\\s+?"," ");
             input.trim();
             commandTokens = new ArrayList<String>(Arrays.asList
                                 (input.replaceAll("\\s+", " ").split(" ")));
@@ -61,7 +61,7 @@ public final class Shell {
 
             for (Command cmd : allowedCommands) {
 
-                if (cmd.matches(commandTokens.get(0))) {
+                if (commandTokens.size() != 0 && cmd.matches(commandTokens.get(0))) {
                     System.out.print(cmd.execute());
                     commandMatched = true;
                 }

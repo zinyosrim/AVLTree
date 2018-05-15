@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 /**
- * Class for shell command {@code find}
+ * Class for shell command {@code findNode}
  */
 public class CmdFind implements Command {
 
@@ -21,21 +21,26 @@ public class CmdFind implements Command {
      */
     @Override
     public String execute() {
-        String key = this.commandTokens.get(1);
-        ThreeDObject value = avlTreeMap.get(key);
+        if (commandTokens.size() == 2) {
+            String key = this.commandTokens.get(1);
+            ThreeDObject value = avlTreeMap.get(key);
 
-        if (value == null) {
-            return "Error! " + key + " doesn't exist.\n";
-        } else return value.toString() + "\n";
+            if (value == null) {
+                return "Error! " + key + " doesn't exist.\n";
+            } else return value.toString() + "\n";
+        }
+        else {
+            return "Error! Wrong number of parameters.\n";
+        }
     }
 
     /**
-     * Match the shell command {@code find}
+     * Match the shell command {@code findNode}
      * @param cmd
-     * @return {@code true} if input parameter specifies the shell command {@code find}
+     * @return {@code true} if input parameter specifies the shell command {@code findNode}
      */
     @Override
     public boolean matches(String cmd) {
-        return ("find".startsWith(cmd.toLowerCase()));
+        return ("findNode".startsWith(cmd.toLowerCase()));
     }
 }

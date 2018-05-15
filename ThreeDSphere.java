@@ -29,7 +29,7 @@ public class ThreeDSphere extends ThreeDObject {
      */
     @Override
     double area() {
-        return 4*Math.PI*r*4;
+        return 4*Math.PI*r*r;
     }
 
     @Override
